@@ -280,7 +280,14 @@ float Complex::Arg() const
     return result;
 }
 
+PolarNumber Complex::polar() const {
+    PolarNumber buffer;
 
+    buffer.setMag(Mag());
+    buffer.setArg(Arg());
+
+    return buffer;
+}
 
 
 #ifdef BouwDesktopApp
