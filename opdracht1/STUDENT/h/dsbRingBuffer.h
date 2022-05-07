@@ -235,7 +235,7 @@ public:
 	                                                  writePtr(elements)
 	{
 		assert(a != 0);
-
+        reset();
 	};
 
 	/*! @brief The standard constructor for a circular buffer with static external memory allocation.
@@ -281,7 +281,11 @@ public:
 	/*! @brief De reset function should take care of resetting the buffer to the initial state. */
 	void reset()
 	{
-
+        readPtr = writePtr = elements;
+        for (int i = 0; i < size; i++)
+        {
+            memset(elements + i, 0, sizeof(ttype));
+        }
 	};
 
 
@@ -291,7 +295,7 @@ public:
 	/*! @brief This function gives the number of elements in the buffer. */
 	unsigned short giveSize() const
 	{
-
+        return size;
 	};
 
 
@@ -303,7 +307,12 @@ public:
 	 * @note both read and write pointer must be updated. */
 	void write(const ttype getal)
 	{
-
+        *(writePtr++) = getal;
+        readPtr++;
+        if (writePtr == (elements + size))
+        {
+            readPtr = writePtr = elements;
+        }
 	};
 
 
@@ -315,7 +324,12 @@ public:
 	 * @note move the readPtr. */
 	ttype read()
 	{
-
+        readPtr--;
+        if (readPtr < elements)
+        {
+            readPtr = elements + size - 1;
+        }
+        return *(readPtr);
 	};
 
 
@@ -326,7 +340,16 @@ public:
 	* @note do not move the readPtr. */
 	ttype read(const unsigned int index) const
 	{
-
+        ttype* buffer;
+        if ((readPtr - 1 - index) < elements)
+        {
+            buffer = readPtr + size - index - 1;
+        }
+        else
+        {
+            buffer = readPtr - index - 1;
+        }
+        return *buffer;
 	};
 
 
@@ -339,7 +362,7 @@ public:
 	 * @note monitor the buffer limits in the function. */
 	ttype operator [](const unsigned int index) const
 	{
-
+        return elements[index];
 	}
 
 
@@ -350,7 +373,12 @@ public:
 	 * @return the sum value. */
 	ttype sum() const
 	{
-
+        ttype  result = 0;
+        for (auto i = 1; i < size; i++)
+        {
+            result += read(size - i - 1);
+        }
+        return result;
 	};
 
 
@@ -360,7 +388,9 @@ public:
 	* @return the average value. */
 	ttype average() const
 	{
-
+        ttype result = 0;
+        result = (sum() / size);
+        return result;
 	};
 
 
