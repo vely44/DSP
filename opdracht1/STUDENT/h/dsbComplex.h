@@ -168,6 +168,8 @@ public:
 	 * @return the phase angle. */
 	float Arg() const;
 
+    void setMag(float mag) { magnitude = mag; }
+    void setArg(float arg) { phase = arg; }
 #ifdef BouwDesktopApp
 	/*! @brief logging function */
 	wxString str() const;
@@ -222,7 +224,7 @@ public:
 	Complex conj() const;
 
 #ifdef BouwDesktopApp
-	/*! @brief print the complex numer as a wxString */
+	/*! @brief print the complex number as a wxString */
 	wxString str() const;
 	
 	/*! @brief Format as string in a format dat can be imported below. */
