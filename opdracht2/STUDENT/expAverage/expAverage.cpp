@@ -18,11 +18,11 @@ ExponentialAverageFilter::ExponentialAverageFilter(const float wf) : alfa(wf),mi
 
 float ExponentialAverageFilter::filter(const float input)
 {
-#error “Dit stuk software ontbreekt / This part of the software is missing !!”
-/* Geachte student,
-    Dit stuk ontbreekt. Werk dit uit om de opdracht uit te voeren. 
-     Honourable student,
-     This part of the software is missing. Fill in your implementation to fulfill the task. */
+
+    /* Student part
+     * calculate moving average */
+    ema = (alfa * input) + (minalfa * ema);
+    return ema;
 
 }
 
