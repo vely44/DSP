@@ -115,6 +115,3 @@ protected:
 DECLARE_APP(GemWaardeOpdracht)
 
 #endif // GEMWAARDE_H
-
-
-
