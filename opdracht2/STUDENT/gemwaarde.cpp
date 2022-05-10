@@ -23,22 +23,117 @@ $Id: gemwaarde.cpp 4067 2021-01-14 17:10:15Z ewout $
 #if (InterfaceTaalNederlands)
 #error  "(gemwaarde.cpp) Student naam en nummer moeten beneden in de velden worden ingevuld."
 #elif defined (InterfaceTaalEnglish)
-#error  "(gemwaarde.cpp) Student name and number must be entered into the fields below."
+//#error  "(gemwaarde.cpp) Student name and number must be entered into the fields below."
 #endif
-/********  Naam/name     :               ******/
-/********  Studentnummer :               ******/
+/********  Naam/name     :   Daniel Velicu            ******/
+/********  Studentnummer :     586799          ******/
 
 void GemWaardeVenster::drawDataHandler(wxCommandEvent &event)
 {
-#error “Dit stuk software ontbreekt / This part of the software is missing !!”
-/* Geachte student,
-    Dit stuk ontbreekt. Werk dit uit om de opdracht uit te voeren. 
-     Honourable student,
-     This part of the software is missing. Fill in your implementation to fulfill the task. */
+    /* Student part here:  */
+    const auto buffsize = avgValueSlider->GetValue();
+    const auto choice = filterSelectionRadioBox->GetSelection();
+    //const auto dataCount = data.GetCount();
 
 
-	/* laat dit hieronder staan. / Leave this statement in place. */
-	gemVeranderd = false;
+    grafiek->clearCanvas(); //Clean the screen, from grafiekVenster.h
+
+    if (choice == 0)
+    {
+        LineList lineList;
+
+        RingBuffer<double> buffer(buffsize); //Use ringbuffer exercise 1
+        PointList pointlist;
+        double averageValue = 0.0f;
+        double sum = 0.0f;
+        //double readData = 0.0f;
+
+        auto x = 0;
+        for (auto& rate : data)
+        {
+            buffer.write(rate);
+            const wxPoint point(x++, 1000 * rate);
+            pointlist.Add(point);
+            wxLogDebug(wxString::Format(wxT("value of x = %d"), x));
+            if (x >= buffsize)
+            {
+                const wxPoint startPoint(x - 1, averageValue);
+                averageValue = 1000 * buffer.average();
+                const wxPoint endPoint(x, averageValue);
+                const LijnStuk line(startPoint, endPoint, false);
+                lineList.Add(line);
+            }
+            else if (x < buffsize)
+            {
+                const wxPoint startPoint(x - 1, averageValue);
+                sum += buffer.read(0);
+                averageValue = 1000 * sum / buffsize;
+                const wxPoint endPoint(x, averageValue);
+                const LijnStuk line(startPoint, endPoint, false);
+                lineList.Add(line);
+            }
+        }
+
+        grafiek->setDrawingPen(wxPen(wxColor(wxT("RED")), 2, wxSOLID));
+        grafiek->drawBars(pointlist, true, false);
+
+        grafiek->setDrawingPen(wxPen(wxColor(wxT("BLUE")), 2, wxSOLID));
+        grafiek->drawLines(lineList, true);
+    }
+    else if (choice == 1)
+    {
+        ExponentialAverageFilter expfilter(0.01 * buffsize);
+        //float bufferEma = 0.0f;
+        LineList lineList;
+
+        PointList pointlist;
+        double averageValue = 0.0f;
+        //double sum = 0.0f;
+
+        auto x = 0;
+        for (auto& rate : data)
+        {
+            const wxPoint point(x++, 1000 * rate);
+            pointlist.Add(point);
+
+            if (x >= 1)
+            {
+                const wxPoint startPoint(x - 1, averageValue);
+                averageValue = expfilter.filter(1000 * rate);
+                const wxPoint endPoint(x, averageValue);
+                const LijnStuk line(startPoint, endPoint, false);
+                lineList.Add(line);
+            }
+        }
+        grafiek->setDrawingPen(wxPen(wxColor(wxT("RED")), 2, wxSOLID));
+        grafiek->drawBars(pointlist, true, false);
+
+        grafiek->setDrawingPen(wxPen(wxColor(wxT("BLUE")), 2, wxSOLID));
+        grafiek->drawLines(lineList, true);
+    }
+    grafiek->setDrawingPen(wxPen(wxColor(wxT("BLACK")), 2, wxSOLID));
+
+    grafiek->drawHorizontalLine(70);
+    const wxPoint Euro_1(0, 70);
+    grafiek->putNormalText("Euro 0.65", Euro_1);
+
+    grafiek->drawHorizontalLine(170);
+    const wxPoint Euro_2(0, 170);
+    grafiek->putNormalText("Euro 0.70", Euro_2);
+
+    grafiek->drawHorizontalLine(270);
+    const wxPoint Euro_3(0, 270);
+    grafiek->putNormalText("Euro 0.75", Euro_3);
+
+    grafiek->drawHorizontalLine(370);
+    const wxPoint Euro_4(0, 370);
+    grafiek->putNormalText("Euro 0.80", Euro_4);
+
+    grafiek->drawHorizontalLine(470);
+    const wxPoint Euro_5(0, 470);
+    grafiek->putNormalText("Euro 0.85", Euro_5);
+    /* / Leave this statement in place. */
+    gemVeranderd = false;
 }
 
 /*********** Geachte studenten , hieronder NIETS veranderen.              ******/
@@ -283,40 +378,4 @@ bool GemWaardeOpdracht::OnInit()
 	venster->Show();
 	return(true);
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
