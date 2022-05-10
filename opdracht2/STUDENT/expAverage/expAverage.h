@@ -27,13 +27,8 @@ public:
 
 private:
 
-
-
-#error “Dit stuk software ontbreekt / This part of the software is missing !!”
-/* Geachte student,
-    Dit stuk ontbreekt. Werk dit uit om de opdracht uit te voeren. 
-     Honourable student,
-     This part of the software is missing. Fill in your implementation to fulfill the task. */
+    /* Student part here */
+    float ema = 0.0f;
 
 
 	/* The weighing factor and its counterpart (1-alfa)  */
