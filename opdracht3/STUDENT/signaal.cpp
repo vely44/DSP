@@ -24,15 +24,15 @@ $Id: signaal.cpp 4067 2021-01-14 17:10:15Z ewout $
 #include <wx/wfstream.h>
 #include <wx/txtstrm.h>
 #include <dsbComplex.h>
-
+#include <cmath>
 
 #if (InterfaceTaalNederlands)
 #error  "(signaal.cpp) Student naam en nummer moeten beneden in de velden worden ingevuld."
 #elif defined (InterfaceTaalEnglish)
-#error  "(signaal.cpp) Student name and number must be entered into the fields below."
+
 #endif
-/********  Naam/name     :               ******/
-/********  Studentnummer :               ******/
+/********  Naam/name     :       Daniel Velicu        ******/
+/********  Studentnummer :       586799        ******/
 
 /* Dit is de functie die wordt aangeroepen wanneer de knop Tekenen wordt ingedrukt. Vul alle ontbrekende stukken in.
 * This is the function that is called when the draw button is depressed. Fill in all void parts.  */
@@ -48,12 +48,16 @@ void SignaalVenster::tekenReeksHandler(wxCommandEvent &event)
 	else
 	{
 		PuntLijst punten; /* wxArray van wxPoints */
-
+        PuntLijst ampPunten;
+        PuntLijst phasePunten;
 		if (SignaalType::DataBestand != sigKeuze)
 		{
 			const wxCoord ampl = 1024; //32768;   /* amplitude = 80% van scherm */
 			const double hoekFreq = 2 * Pi*sigFreq / sampFreq;
 			auto normHoek = 0.0;
+            int n = 0;
+            double delta = 2 * ampl / Pi * hoekFreq;
+            double buffer = 0;
 
 			UInt32 stap = 0;
 
@@ -64,21 +68,40 @@ void SignaalVenster::tekenReeksHandler(wxCommandEvent &event)
 
 				auto sigWaarde = 0.0f;
 
-				/* Evalueer het signaaltype en vul het juiste signaalformulier in. */
+				/*  */
 				/* Evaluate the signal type and fill in the appropriate signal form */
 				switch (sigKeuze)
 				{
-					/* Vul hier alle vereiste case velden van de switch in. */
+					/* */
 					/* Complete all required switch case statements here. */
-#error “Dit stuk software ontbreekt / This part of the software is missing !!”
-/* Geachte student,
-    Dit stuk ontbreekt. Werk dit uit om de opdracht uit te voeren. 
-     Honourable student,
-     This part of the software is missing. Fill in your implementation to fulfill the task. */
+                        /* Student part*/
+						/* The remaining case statements are listed from here.  */
 
+                    case SignaalType::Cosine:
+                        sigWaarde = ampl * cos(hoek);
+                        break;
 
-						/* De overgebleven case statements staan vanaf hier.
-						* The remaining case statements are listed from here.  */
+                    case SignaalType::SquareWave:
+                        if (cos(hoek) >= 0)
+                        {
+                            sigWaarde = ampl;
+                        }
+                        else{
+                            sigWaarde = -ampl;
+                        }
+                        break;
+
+                    case SignaalType::Triangle:
+                        if (cos(hoek)>=0)
+                        {
+                            buffer += delta;
+                        }else{
+                            buffer -= delta;
+                        }
+                        sigWaarde = buffer;
+                        wxLogDebug(wxString::Format(wxT("%f: %f"), sin(hoek), sigWaarde));
+                        break;
+
 					case SignaalType::DataBestand:
 						sigWaarde = -1.234f;
 						wxFAIL_MSG(_("Not allowed."));
@@ -92,17 +115,6 @@ void SignaalVenster::tekenReeksHandler(wxCommandEvent &event)
 				}
 				signaal.Add(sigWaarde);
 				punten.Add(wxPoint(stap++, static_cast<int>(sigWaarde)));
-
-				/* Vul indien nodig dit gedeelte in met software-instructies.
-				* Negeer het onderstaande bericht als dit niet het geval is.*/
-				/* If necessary, fill out this portion with software instructions.
-				* If not, please ingore the message below. */
-
-#error “Dit stuk software ontbreekt / This part of the software is missing !!”
-/* Geachte student,
-    Dit stuk ontbreekt. Werk dit uit om de opdracht uit te voeren. 
-     Honourable student,
-     This part of the software is missing. Fill in your implementation to fulfill the task. */
 
 
 			}
@@ -132,26 +144,68 @@ void SignaalVenster::tekenReeksHandler(wxCommandEvent &event)
 		 * draw the time domain image using auto scaling. */
 		signaalGrafiek->tekenStaven(punten, true);
 
-		/* Nederlands :  Voeg hier de code toe om de FFT uit te rekenen en het frequentiebeeld in fftwGrafiek te tekenen.
-		* tips :
-		* 1) gebruik het r2c plan en de FFTW_PRESERVE_INPUT+FFTW_ESTIMATE vlaggen bij de berekening.
-		* 2) gebruik de Complex en Polair klassen uit opdracht 1.
-		* 3) Bij de faseberekening, forceer de fase naar nul als de grootte van het complexe getal < faseToonGrens (zie de constructor van deze klasse) .
-		* 4) voor info over de uitlezing van de checkboxes voor amplitude en fase , zie http://docs.wxwidgets.org/3.0/classwx_check_box.html */
-
 		/* English : Add the code here to calculate the FFT and to draw the frequency image in fftw Graph.
 		* tips:
 		* 1) use the r2c plan and the FFTW_PRESERVE_INPUT + FFTW_ESTIMATE flags in the calculation.
 		* 2) use the Complex and Polar classes from assignment 1.
 		* 3) In the phase calculation, force the phase to zero as the size of the complex number <phaseTone Border(see the constructor of this class).
-		* 4) for info about the readout of the amplitude and phase checkboxes, see http ://docs.wxwidgets.org/3.0/classwx_check_box.html */
+		* 4) for info about the readout of the amplitude and phase checkboxes, see http ://docs.wxwidgets.org/3.0/classwx_check_box.html
+        * student part starts here */
+        const auto size = signaal.GetCount();
 
-#error “Dit stuk software ontbreekt / This part of the software is missing !!”
-/* Geachte student,
-    Dit stuk ontbreekt. Werk dit uit om de opdracht uit te voeren. 
-     Honourable student,
-     This part of the software is missing. Fill in your implementation to fulfill the task. */
+        fftw_complex* output = fftw_alloc_complex(size / 2 + 1);
 
+        fftw_plan p = fftw_plan_dft_r2c_1d(size, &(signaal[0]), output, FFTW_PRESERVE_INPUT + FFTW_ESTIMATE); //Used r2c plan and FFTW_PRESERVE_INPUT + FFTW_ESTIMATE
+
+        fftw_execute(p);
+        fftw_destroy_plan(p);
+        fftw_cleanup();
+
+        ampPunten.Clear();
+        phasePunten.Clear();
+
+        for (int i = 0; i < (size / 2 + 1); i++)
+        {
+            const Complex buffer((float)output[i][0], (float)output[i][1]); //Used complex buffer
+
+            ampPunten.Add(wxPoint(i, 100 * buffer.Mag()));
+            ampPunten.Add(wxPoint(-i, 100 * buffer.Mag()));
+
+            if ((double)buffer.Mag() < faseToonGrens)
+            {
+                phasePunten.Add(wxPoint(i, 0));
+                phasePunten.Add(wxPoint(-i, 0));
+            }
+            else
+            {
+                phasePunten.Add(wxPoint(i, 100 * buffer.Arg()));
+                phasePunten.Add(wxPoint(-i, 100 * buffer.Arg()));
+            }
+
+            if (dumpFreqDomeinCheckBox->IsChecked())
+            {
+                wxLogMessage(wxT("FFT[%i] = Re = %f, Im = %f, |%f|/%f"), i, buffer.Re(), buffer.Im(), buffer.Mag(), buffer.Arg());
+            }
+
+        }
+        ampPunten.Shrink();
+        phasePunten.Shrink();
+
+        fftwGrafiek->maakSchoon();
+        fftwGrafiek->zetTekenPen(assenPen);
+        fftwGrafiek->tekenAssenstelsel();
+
+        if (ampCheckBox->IsChecked())
+        {
+            fftwGrafiek->zetTekenPen(ampPen);
+            fftwGrafiek->tekenStaven(ampPunten, true);
+        }
+        if (faseCheckBox->IsChecked())
+        {
+            fftwGrafiek->zetTekenPen(fasePen);
+            fftwGrafiek->tekenStaven(phasePunten, true);
+        }
+        fftw_free(output);
 
 		venster_statusbar->SetStatusText(_("Frequency image was constructed."));
 	}
@@ -578,92 +632,4 @@ bool SignaalApp::OnInit()
 	return(true);
 
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
