@@ -14,10 +14,10 @@ $Id: filterOntwerper.cpp 4067 2021-01-14 17:10:15Z ewout $
 #if (InterfaceTaalNederlands)
 #error  "(filterOntwerper.cpp) Student naam en nummer moeten beneden in de velden worden ingevuld."
 #elif defined (InterfaceTaalEnglish)
-#error  "(filterOntwerper.cpp) Student name and number must be entered into the fields below."
+//#error  "(filterOntwerper.cpp) Student name and number must be entered into the fields below."
 #endif
-/********  Naam/name     :               ******/
-/********  Studentnummer :               ******/
+/********  Naam/name     :  Daniel Velicu             ******/
+/********  Studentnummer :  586799           ******/
 
 #include <cassert>
 #include <cmath>
@@ -226,23 +226,20 @@ double FilterVenster::triangle(const Int32 n ) const
 {
 	/*! @note Write in this function the code to implement the triangle function.
 	 * Note the formula in Lynn & FÃ¼rst is not good.*/
-#error “Dit stuk software ontbreekt / This part of the software is missing !!”
-/* Geachte student,
-    Dit stuk ontbreekt. Werk dit uit om de opdracht uit te voeren. 
-     Honourable student,
-     This part of the software is missing. Fill in your implementation to fulfill the task. */
+/* student part here  */
+    double threeangle{ 0.0 };
 
+
+
+
+    return threeangle;
 }
 
 
 double FilterVenster::hamming(const Int32 n ) const
 {
 	/*! @note Write in this function the code to implement the Hamming function.*/
-#error “Dit stuk software ontbreekt / This part of the software is missing !!”
-/* Geachte student,
-    Dit stuk ontbreekt. Werk dit uit om de opdracht uit te voeren. 
-     Honourable student,
-     This part of the software is missing. Fill in your implementation to fulfill the task. */
+/* student part here  */
 
 }
 
@@ -250,12 +247,14 @@ double FilterVenster::hamming(const Int32 n ) const
 double FilterVenster::sinc(const double angle ) const
 {
 	/*! @note Write the code in this function to implement the sinc () function. */
-#error “Dit stuk software ontbreekt / This part of the software is missing !!”
-/* Geachte student,
-    Dit stuk ontbreekt. Werk dit uit om de opdracht uit te voeren. 
-     Honourable student,
-     This part of the software is missing. Fill in your implementation to fulfill the task. */
 
+/* student part here  */
+    double result;
+    if(angle ==0 )
+        result = 1;
+    else
+        result = sin(angle)/angle;
+    return result;
 }
 
 void FilterVenster::berekenFilterHandler(wxCommandEvent &event)
@@ -275,18 +274,14 @@ void FilterVenster::berekenFilterHandler(wxCommandEvent &event)
 	/* an array of wxPoints that you can use to draw the impulse response */
 	PointList impulseResponse;
 
-	/* Verwijder oude filter coefficienten voor de berekening begint.
+	/* .
 	 * Remove old filter coefficients before the calculation starts.*/
 	filterCoeffs.Clear();
 
 	wxLogDebug(_("filter calculation start."));
 	wxBusyCursor busy;
 
-#error “Dit stuk software ontbreekt / This part of the software is missing !!”
-/* Geachte student,
-    Dit stuk ontbreekt. Werk dit uit om de opdracht uit te voeren. 
-     Honourable student,
-     This part of the software is missing. Fill in your implementation to fulfill the task. */
+/* student part here */
 
 	/* switch on the test button*/
 	berekeningKlaar = true;
@@ -300,11 +295,8 @@ void FilterVenster::computeFreqResponse()
 
 	H_Omega.Clear();
 
-#error “Dit stuk software ontbreekt / This part of the software is missing !!”
-/* Geachte student,
-    Dit stuk ontbreekt. Werk dit uit om de opdracht uit te voeren. 
-     Honourable student,
-     This part of the software is missing. Fill in your implementation to fulfill the task. */
+
+/* Student part here  */
 
 }
 
@@ -383,11 +375,8 @@ Int16 FilterVenster::computeFixedPoint(const float flp) const
 	/*! @note Calculate the conversion from floating point to fixed point in this function
 	 * based on the setting in fipBitsSpinCtrl. */
 
-#error “Dit stuk software ontbreekt / This part of the software is missing !!”
-/* Geachte student,
-    Dit stuk ontbreekt. Werk dit uit om de opdracht uit te voeren. 
-     Honourable student,
-     This part of the software is missing. Fill in your implementation to fulfill the task. */
+
+/* student part hre */
 
 	return(-1);
 }
@@ -397,11 +386,8 @@ float FilterVenster::computeFloatingPoint(const Int16 fixp) const
 	/*! @note Calculate the conversion from fixed point to floating point in this function
      * based on the setting in fipBitsSpinCtrl.*/
 
-#error “Dit stuk software ontbreekt / This part of the software is missing !!”
-/* Geachte student,
-    Dit stuk ontbreekt. Werk dit uit om de opdracht uit te voeren. 
-     Honourable student,
-     This part of the software is missing. Fill in your implementation to fulfill the task. */
+
+/* student part here  */
 
 	return(-1);
 }
@@ -449,11 +435,10 @@ void FilterVenster::tijdViewMuisBewegingHandler(wxMouseEvent &event)
 	{
 
 		const wxPoint mouseCoord(tijdDomeinGrafiek->converteerMuisPositie(const_cast<wxMouseEvent &>(event)));
-#error “Dit stuk software ontbreekt / This part of the software is missing !!”
-/* Geachte student,
-    Dit stuk ontbreekt. Werk dit uit om de opdracht uit te voeren. 
-     Honourable student,
-     This part of the software is missing. Fill in your implementation to fulfill the task. */
+
+
+
+/* student part here  */
 
 	}
 #endif
@@ -468,11 +453,8 @@ void FilterVenster::freqViewMuisBewegingHandler(wxMouseEvent &event)
 	{
 
 		const wxPoint muiscoord(freqDomeinGrafiek->converteerMuisPositie(const_cast<wxMouseEvent &>(event)));
-#error “Dit stuk software ontbreekt / This part of the software is missing !!”
-/* Geachte student,
-    Dit stuk ontbreekt. Werk dit uit om de opdracht uit te voeren. 
-     Honourable student,
-     This part of the software is missing. Fill in your implementation to fulfill the task. */
+
+/* Student part here  */
 
 	}
 #endif
