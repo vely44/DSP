@@ -31,16 +31,16 @@ $Id: signaal.cpp 4067 2021-01-14 17:10:15Z ewout $
 #elif defined (InterfaceTaalEnglish)
 
 #endif
-/********  Naam/name     :       Daniel Velicu        ******/
-/********  Studentnummer :       586799        ******/
+/********  Naam/name     : Daniel Velicu ******/
+/********  Studentnummer : 586799        ******/
 
-/* Dit is de functie die wordt aangeroepen wanneer de knop Tekenen wordt ingedrukt. Vul alle ontbrekende stukken in.
+/*
 * This is the function that is called when the draw button is depressed. Fill in all void parts.  */
 void SignaalVenster::tekenReeksHandler(wxCommandEvent &event)
 {
 	const UInt32 aantalSampPerPeriod = sampFreq / sigFreq;
 
-	venster_statusbar->SetStatusText(_("FFTW start of calcation"));
+	venster_statusbar->SetStatusText(_("FFTW start of calculation"));
 
 	if (false == (aantalSampPerPeriod >1))
             wxLogError(_("The signal could not be sampled, because")+wxT(" \n")+
@@ -53,9 +53,9 @@ void SignaalVenster::tekenReeksHandler(wxCommandEvent &event)
 		if (SignaalType::DataBestand != sigKeuze)
 		{
 			const wxCoord ampl = 1024; //32768;   /* amplitude = 80% van scherm */
-			const double hoekFreq = 2 * Pi*sigFreq / sampFreq;
-			auto normHoek = 0.0;
-            int n = 0;
+			const double hoekFreq = 2 * Pi*sigFreq / sampFreq; // corner freq
+			//auto normHoek = 0.0; //not needed
+            //int n = 0; // not needed
             double delta = 2 * ampl / Pi * hoekFreq;
             double buffer = 0;
 
@@ -75,7 +75,7 @@ void SignaalVenster::tekenReeksHandler(wxCommandEvent &event)
 					/* */
 					/* Complete all required switch case statements here. */
                         /* Student part*/
-						/* The remaining case statements are listed from here.  */
+						/* The remaining case statements are listed from here. - Done */
 
                     case SignaalType::Cosine:
                         sigWaarde = ampl * cos(hoek);
@@ -137,10 +137,10 @@ void SignaalVenster::tekenReeksHandler(wxCommandEvent &event)
 
 		wxLogDebug(_("Number of values=%d"), static_cast<UInt32>(signaal.GetCount()));
 
-		/*  veeg tijddomein schoon.
+		/*
 		 *  wipe clean the time domain.  */
 		signaalGrafiek->maakSchoon();
-		/* teken het tijddomeinbeeld met gebruik van autoschaling.
+		/*
 		 * draw the time domain image using auto scaling. */
 		signaalGrafiek->tekenStaven(punten, true);
 
@@ -150,13 +150,13 @@ void SignaalVenster::tekenReeksHandler(wxCommandEvent &event)
 		* 2) use the Complex and Polar classes from assignment 1.
 		* 3) In the phase calculation, force the phase to zero as the size of the complex number <phaseTone Border(see the constructor of this class).
 		* 4) for info about the readout of the amplitude and phase checkboxes, see http ://docs.wxwidgets.org/3.0/classwx_check_box.html
+
         * student part starts here */
         const auto size = signaal.GetCount();
 
         fftw_complex* output = fftw_alloc_complex(size / 2 + 1);
 
-        fftw_plan p = fftw_plan_dft_r2c_1d(size, &(signaal[0]), output, FFTW_PRESERVE_INPUT + FFTW_ESTIMATE); //Used r2c plan and FFTW_PRESERVE_INPUT + FFTW_ESTIMATE
-
+        fftw_plan p = fftw_plan_dft_r2c_1d(size, &(signaal[0]), output, FFTW_PRESERVE_INPUT + FFTW_ESTIMATE); //Used 1d DFT r2c plan and FFTW_PRESERVE_INPUT + FFTW_ESTIMATE
         fftw_execute(p);
         fftw_destroy_plan(p);
         fftw_cleanup();
@@ -188,6 +188,7 @@ void SignaalVenster::tekenReeksHandler(wxCommandEvent &event)
             }
 
         }
+
         ampPunten.Shrink();
         phasePunten.Shrink();
 
@@ -632,4 +633,92 @@ bool SignaalApp::OnInit()
 	return(true);
 
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
