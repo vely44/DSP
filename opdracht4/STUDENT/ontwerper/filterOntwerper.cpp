@@ -228,9 +228,9 @@ double FilterVenster::triangle(const Int32 n ) const
 	 * Note the formula in Lynn & FÃ¼rst is not good.*/
 /* student part here  */
     double threeangle{ 0.0 };
+    threeangle = 1.0-(double)abs(n)/((double)orde+1.0);
 
-
-
+    wxLogDebug(wxT("Triangle= %lf"),threeangle);
 
     return threeangle;
 }
@@ -240,7 +240,11 @@ double FilterVenster::hamming(const Int32 n ) const
 {
 	/*! @note Write in this function the code to implement the Hamming function.*/
 /* student part here  */
+    double ham{ 0.0 };
+    ham = 0.54+0.46 * cos(((float)n*Pi)/float (orde));
 
+    wxLogDebug(wxT("Hamming= %lf"),ham);
+    return ham;
 }
 
 
@@ -283,7 +287,52 @@ void FilterVenster::berekenFilterHandler(wxCommandEvent &event)
 
 /* student part here */
 
-	/* switch on the test button*/
+//IR FIR filter
+
+    const double omegaB{ Pi * (filterEind - filterBegin) / sampFreq };
+    const double omegaC{ Pi * (filterBegin + filterEind) / sampFreq };    //Formula at page 141
+    //*Amplitude factor - formula 5.11
+    const auto amplVersterking = 2 * (omegaB / Pi) * compute_Linear(maxVersterkingSpinCtrl->GetValue());
+
+    //Calculating FIR filter coefficients from -M to M
+    for (Int32 n = -1 * orde; n <= orde + 1; n++) {
+        auto sincValue = sinc(n * omegaB);
+        auto cosCenter = cosf(n * omegaC);
+        auto coeffValue = amplVersterking * sincValue * cosCenter;
+
+        //Multipling IR with window function
+        switch (vensterChoice->GetSelection()) {
+            case 0:
+                break;
+            case 1:
+                //triangle
+                coeffValue = coeffValue * triangle(n);
+                break;
+            case 2:
+                //hamming
+                coeffValue = coeffValue * hamming(n);
+                break;
+            default:
+                wxLogDebug(wxT("ERROR with the IR"));
+                break;
+        }
+        //Calculating the functions FixedPoint() and CalculateFloatingPoint()
+        wxLogDebug(wxT("Coef. Value Fixed point =%d"), computeFixedPoint(coeffValue));
+        wxLogDebug(wxT("Coef. Value Floating point =%lf"), computeFloatingPoint(computeFixedPoint(coeffValue)));
+
+        //Saving coef.
+        filterCoeffs.Add(computeFixedPoint(coeffValue));
+        impulseResponse.Add(wxPoint(n, computeFixedPoint(coeffValue)));
+    }
+
+    //Drawing IR
+    tijdDomeinGrafiek->tekenStaven(impulseResponse, true);
+
+    //Calculation and drawing of the freq. response
+
+    computeFreqResponse();
+    drawFreqSpectrum();
+
 	berekeningKlaar = true;
 }
 
@@ -297,6 +346,38 @@ void FilterVenster::computeFreqResponse()
 
 
 /* Student part here  */
+//Determination and calculation of : Variables of Fourier Freq. transform FIR filter, with formula 5.14.
+
+    const double omegaB = Pi * (filterEind - filterBegin) / sampFreq;
+    const double amplifierLineair = compute_Linear(maxVersterkingSpinCtrl->GetValue());
+    const unsigned int aantalPunten = FreqSpectrumPunten(taps);
+    double omega{ 0 };
+    double freqResp{ 0 };
+
+    //Computing the freq. spectrum
+    for (int count = 0; count < aantalPunten; count++)
+    {
+        omega = Pi * ((double)count / (double)aantalPunten);
+        //Resetting the freqResp var.
+        freqResp = 0.0;
+        //Starting the Fourier Transform FIR filter
+        for (int k = 1; k < orde + 1; k++)
+        {
+            freqResp += ((computeFloatingPoint(filterCoeffs[k + orde]) / 2 / amplifierLineair * cos(k * omega)));
+        }
+
+        freqResp = freqResp * 2.0;
+        //Calculating just the first term in 5.14
+        freqResp = freqResp + (omegaB / PI);
+
+        //saving the results
+        H_Omega.Add(compute_dB(freqResp) + maxVersterkingSpinCtrl->GetValue() + 6);
+        //Adding the scale factor
+    }
+
+    //Min and Max over 0 to π in dB
+    H_Omega_min = *std::min_element(H_Omega.begin(), H_Omega.end());
+    H_Omega_max = *std::max_element(H_Omega.begin(), H_Omega.end());
 
 }
 
@@ -377,8 +458,7 @@ Int16 FilterVenster::computeFixedPoint(const float flp) const
 
 
 /* student part hre */
-
-	return(-1);
+    return static_cast<Int16>(round(flp * (1 << fipBitsSpinCtrl->GetValue())));
 }
 
 float FilterVenster::computeFloatingPoint(const Int16 fixp) const
@@ -388,8 +468,7 @@ float FilterVenster::computeFloatingPoint(const Int16 fixp) const
 
 
 /* student part here  */
-
-	return(-1);
+    return (static_cast<double>(fixp) / static_cast<double>(1 << fipBitsSpinCtrl->GetValue()));
 }
 
 #endif
@@ -438,7 +517,7 @@ void FilterVenster::tijdViewMuisBewegingHandler(wxMouseEvent &event)
 
 
 
-/* student part here  */
+ /*student part here  */
 
 	}
 #endif
@@ -454,7 +533,7 @@ void FilterVenster::freqViewMuisBewegingHandler(wxMouseEvent &event)
 
 		const wxPoint muiscoord(freqDomeinGrafiek->converteerMuisPositie(const_cast<wxMouseEvent &>(event)));
 
-/* Student part here  */
+ /* Student part here  */
 
 	}
 #endif
@@ -1072,7 +1151,7 @@ void FilterVenster::toonCoefficientenHandler(wxCommandEvent &event)
 		{
 			const Int16 coeff = filterCoeffs[n+orde];
 
-			wxLogMessage(wxString::Format(_("Coefficient[%d] = %d (float:%f)"),n,coeff,berekenFloatingPoint(coeff)));
+			wxLogMessage(wxString::Format(_("Coefficient[%d] = %d (float:%f)"),n,coeff,computeFloatingPoint(coeff)));
 		}
 	}
 }
