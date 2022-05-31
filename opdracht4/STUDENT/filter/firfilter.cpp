@@ -88,7 +88,7 @@ Int16 FilterFirInt16::filter(const Int16 input)
     filterMemory.write(input); //start storing the input
     Int32 result = 0;
     for (Int32 i = 0; i < filterCoeffs.giveSize(); i++){
-        result = result + filterCoeffs[i] * filterMemory.read(); //start reading backwards
+        result = result + filterCoeffs[i] * filterMemory.read(); //start reading backwards 
     }
     return result/scaleFactor;
 }
