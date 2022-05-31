@@ -16,7 +16,7 @@ $Id: filterOntwerper.cpp 4067 2021-01-14 17:10:15Z ewout $
 #elif defined (InterfaceTaalEnglish)
 //#error  "(filterOntwerper.cpp) Student name and number must be entered into the fields below."
 #endif
-/********  Naam/name     :  Daniel Velicu             ******/
+/********  Naam/name     :  Daniel Velicu    ******/
 /********  Studentnummer :  586799           ******/
 
 #include <cassert>
@@ -228,7 +228,8 @@ double FilterVenster::triangle(const Int32 n ) const
 	 * Note the formula in Lynn & FÃ¼rst is not good.*/
 /* student part here  */
     double threeangle{ 0.0 };
-    threeangle = 1.0-(double)abs(n)/((double)orde+1.0);
+
+    threeangle = 1.0 -(double)abs(n) / ((double)orde+1.0);
 
     wxLogDebug(wxT("Triangle= %lf"),threeangle);
 
@@ -241,7 +242,7 @@ double FilterVenster::hamming(const Int32 n ) const
 	/*! @note Write in this function the code to implement the Hamming function.*/
 /* student part here  */
     double ham{ 0.0 };
-    ham = 0.54+0.46 * cos(((float)n*Pi)/float (orde));
+    ham = 0.54 + 0.46 * cos(((float)n*Pi)/float (orde));
 
     wxLogDebug(wxT("Hamming= %lf"),ham);
     return ham;
@@ -254,10 +255,11 @@ double FilterVenster::sinc(const double angle ) const
 
 /* student part here  */
     double result;
-    if(angle ==0 )
+    if(angle == 0 )
         result = 1;
     else
-        result = sin(angle)/angle;
+        result = sin(angle)/angle; // sinc(x)=sin(x)/x   unnormalized sinc
+
     return result;
 }
 
@@ -289,8 +291,13 @@ void FilterVenster::berekenFilterHandler(wxCommandEvent &event)
 
 //IR FIR filter
 
-    const double omegaB{ Pi * (filterEind - filterBegin) / sampFreq };
-    const double omegaC{ Pi * (filterBegin + filterEind) / sampFreq };    //Formula at page 141
+    const double omegaB{ 2 * Pi * (filterEind - filterBegin) / sampFreq }; // inside the filter limits
+    const double omegaC{ 2 * Pi * (filterBegin + filterEind) / sampFreq }; //center freq of my filter
+    //filter begin, filter end are in represented by the number of the sample
+    // /samplefreq = hz  = omega
+    //  total number of samples/sample freq -> hz -> rad/sec
+
+    // Formula at page 141
     //*Amplitude factor - formula 5.11
     const auto amplVersterking = 2 * (omegaB / Pi) * compute_Linear(maxVersterkingSpinCtrl->GetValue());
 
@@ -303,6 +310,7 @@ void FilterVenster::berekenFilterHandler(wxCommandEvent &event)
         //Multipling IR with window function
         switch (vensterChoice->GetSelection()) {
             case 0:
+                coeffValue = coeffValue * sinc(n);
                 break;
             case 1:
                 //triangle
@@ -447,7 +455,7 @@ void FilterVenster::drawFreqSpectrum() const
 	omega = 2*Pi*filterEind/sampFreq;
 	freqDomeinGrafiek->tekenVerticaleLijn((wxCoord)(omega*schaalx));
 
-	freqDomeinGrafiek->zetNormaleTekst(_("Demoversion"),wxPoint(FreqGrafiekBreedte-150, -20));
+	freqDomeinGrafiek->zetNormaleTekst(_("Assignment 4"),wxPoint(FreqGrafiekBreedte-150, -20));
 
 }
 
@@ -713,7 +721,7 @@ FilterVenster::FilterVenster() : wxFrame(nullptr, wxID_ANY,_("FIR Filter Designe
 	freqDomeinGrafiek->zetOorsprong(wxRealPoint(0,0.75));
 	testGrafiek->zetOorsprong(wxRealPoint(0,0.5));
 
-	testGrafiek->zetGroteTekst(_("Demoversie"),wxPoint(0, TestGrafiekHoogte/2));
+	testGrafiek->zetGroteTekst(_("assignment4"),wxPoint(0, TestGrafiekHoogte/2));
 
 }
 
@@ -1326,7 +1334,7 @@ void FilterVenster::klokVerlopenHandler(wxTimerEvent &event)
 	if (testTekenIndex == 0)
 	{
 		testGrafiek->maakSchoon();
-		testGrafiek->zetGroteTekst(_("Demoversie"),wxPoint(100, TestGrafiekHoogte / 2));
+		testGrafiek->zetGroteTekst(_("Assignment 4"),wxPoint(100, TestGrafiekHoogte / 2));
 	}
 
 	if (true == testOrig)  /* teken ook het originele signaal */
