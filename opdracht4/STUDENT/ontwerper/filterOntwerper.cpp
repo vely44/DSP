@@ -255,7 +255,7 @@ double FilterVenster::sinc(const double angle ) const
 
 /* student part here  */
     double result;
-    if(angle == 0 )
+    if(angle ==0 )
         result = 1;
     else
         result = sin(angle)/angle; // sinc(x)=sin(x)/x   unnormalized sinc
@@ -291,8 +291,8 @@ void FilterVenster::berekenFilterHandler(wxCommandEvent &event)
 
 //IR FIR filter
 
-    const double omegaB{  Pi * (filterEind - filterBegin) / sampFreq }; // inside the filter limits
-    const double omegaC{  Pi * (filterBegin + filterEind) / sampFreq }; //center freq of my filter
+    const double omegaB{ Pi * (filterEind - filterBegin) / sampFreq }; // inside the filter limits b = band?!
+    const double omegaC{ Pi * (filterBegin + filterEind) / sampFreq }; //center freq of my filter  c = centre
     //filter begin, filter end are in represented by the number of the sample
     // /samplefreq = hz  = omega
     //  total number of samples/sample freq -> hz -> rad/sec
@@ -334,6 +334,7 @@ void FilterVenster::berekenFilterHandler(wxCommandEvent &event)
     }
 
     //Drawing IR
+    tijdDomeinGrafiek->maakSchoon();
     tijdDomeinGrafiek->tekenStaven(impulseResponse, true);
 
     //Calculation and drawing of the freq. response
